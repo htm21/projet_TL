@@ -21,14 +21,41 @@ class Grammaire:
             return False
         return True
 
+    def lire(self, file):
+
+        with open(file) as file:
+            data = file.readlines()
+        
+        for line in data:
+            line = line.strip()
+            membre_gauche, membre_droit = line.split(":")
+            membre_droit = [part.strip() for part in membre_droit.split("|")]
+            self.regles[membre_gauche] = membre_droit
 
 grammaire_test = Grammaire()
-grammaire_test.ajout_terminal("a")
-grammaire_test.ajout_terminal("b")
-grammaire_test.ajout_terminal("E")
-grammaire_test.ajout_non_terminal("S")
-grammaire_test.regles["S"] = [list("aSbS"), list("a"), list("b"), list("E")]
 
 
+alphabet = "ABCDFGHIJKLMNOPQRSTUVWXYZ"
+for letter in alphabet :
+    for i in range(1, 11):
+        grammaire_test.ajout_terminal(f"{letter}{i}")
+
+print(grammaire_test.est_algébrique())
+grammaire_test.lire("test.general")
 print(grammaire_test)
-print(f"La grammaire est-elle algébrique ? {grammaire_test.est_algébrique()}")
+
+
+
+
+
+########################### SECTION TEST #############################
+
+def test_lire(input):
+    with open(input) as file:
+        data = file.readlines()
+
+    for line in data:
+        line = line.strip()
+        membre_gauche, membre_droit = line.split(":")
+        membre_droit = [part.strip() for part in membre_droit.split("|")]
+        print(f'MEMBRE GAUCHE: {membre_gauche}\nMEMBRE DROIT: {membre_droit}\n')
