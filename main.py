@@ -1,8 +1,10 @@
+import re
+
 class Grammaire:
     def __init__(self):
-        self.terminaux = set()
-        self.non_terminaux = set()
         self.axiome = "S"
+        self.terminaux = set()
+        self.non_terminaux = {self.axiome}
         self.regles = {}
 
     # Getters et Setters
@@ -50,7 +52,7 @@ class Grammaire:
             line = line.strip()
             membre_gauche, membre_droit = line.split(":")
             membre_droit = [part.strip() for part in membre_droit.split("|")]
-            self.regles[membre_gauche.strip()] = [list(symbol) for symbol in membre_droit]
+            self.regles[membre_gauche.strip()] = [re.findall(fr'[A-Z][0-9]|[a-z]|{self.axiome}|E', symbol) for symbol in membre_droit]
 
     def suppression_axiome_membre_droit(self):
         regles = list(self.regles.items())
@@ -63,11 +65,25 @@ class Grammaire:
                     for regle in self.regles[self.axiome]:
                         self.ajout_regle(new_axiome, regle)
                     self.set_axiome(new_axiome)
+    
+    def suppression_terminaux(self):
+        regles = list(self.regles.items())
+
+        for membre_gauche, membre_droit in regles :
+            for i, regle in enumerate(membre_droit):
+                for j, symbol in enumerate(regle):
+                    if symbol in self.terminaux:
+                        # Il faut changer ça (prendre le non-terminal respectif (A1, A2, A3, etc.))
+                        new_non_terminal = f"{symbol.upper()}"
+                        self.ajout_non_terminal(new_non_terminal)
+                        self.ajout_regle(new_non_terminal, [symbol])
+                        self.regles[membre_gauche][i][j] = new_non_terminal
 
     def simplification(self):
 
         # Retire l'axiome des membres droits des règles
         self.suppression_axiome_membre_droit()
+        self.suppression_terminaux()
 
 
 
@@ -84,9 +100,11 @@ if __name__ == "__main__":
         for i in range(1, 11):
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
 
-    grammaire_test.lire("test/suppression_axiome_membre_droit.general")
-    print(grammaire_test.get_regles())
+    grammaire_test.lire("test/test.general")
+    #print(grammaire_test.get_regles())
+    print()
     grammaire_test.simplification()
+    #print()
     print(grammaire_test.get_regles())
     
 
