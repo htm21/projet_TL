@@ -68,16 +68,25 @@ class Grammaire:
     
     def suppression_terminaux(self):
         regles = list(self.regles.items())
+        association_terminal_non_terminal = {} 
 
         for membre_gauche, membre_droit in regles :
             for i, regle in enumerate(membre_droit):
                 for j, symbol in enumerate(regle):
                     if symbol in self.terminaux:
-                        # Il faut changer ça (prendre le non-terminal respectif (A1, A2, A3, etc.))
-                        new_non_terminal = f"{symbol.upper()}"
-                        self.ajout_non_terminal(new_non_terminal)
-                        self.ajout_regle(new_non_terminal, [symbol])
-                        self.regles[membre_gauche][i][j] = new_non_terminal
+
+                        if symbol not in association_terminal_non_terminal:
+                            for non_terminal in self.non_terminaux:
+                                if non_terminal not in association_terminal_non_terminal.values():
+                                    nouveau_non_terminal = non_terminal
+                                    break
+                            
+                            association_terminal_non_terminal[symbol] = nouveau_non_terminal
+
+                            self.ajout_non_terminal(nouveau_non_terminal)
+                            self.ajout_regle(nouveau_non_terminal, [symbol])
+
+                        self.regles[membre_gauche][i][j] = nouveau_non_terminal
 
     def iteration_suppression_epsilon(self):
         terminaux_annule = set()
@@ -104,10 +113,9 @@ class Grammaire:
                         self.ajout_regle(membre_gauche, nouvelle_regle)
                         break
 
-        print(f"TERMINAUX ANNULÉS: {terminaux_annule}\n")
-        print(f"FIN DE L'ITERATION\n{self.regles}\n")
-
-                        
+        #print(f"TERMINAUX ANNULÉS: {terminaux_annule}\n")
+        #print(f"FIN DE L'ITERATION\n{self.regles}\n")
+              
     def suppression_epsilon(self):
         # Générer par GPT, permet de relancer itération par itération
         while any(
@@ -135,7 +143,12 @@ if __name__ == "__main__":
         for i in range(1, 11):
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
 
-    grammaire_test.lire("test/suppression_epsilon.general")    
+    grammaire_test.lire("test/test.general")  
+
+    print(grammaire_test.get_regles())
+    print()
+    grammaire_test.simplification()  
+    print(grammaire_test.get_regles())
 
     ########################### SECTION TEST #############################
 
@@ -153,4 +166,4 @@ if __name__ == "__main__":
         grammaire_test.lire(input)
         grammaire_test.suppression_epsilon()
     
-    test_suppression_epsilon("test/suppression_epsilon.general")
+    #test_suppression_epsilon("test/suppression_epsilon.general")
