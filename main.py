@@ -31,7 +31,7 @@ class Grammaire:
         self.non_terminaux.add(non_terminal)
     
     def ajout_regle(self, non_terminal, regle):
-        if non_terminal in self.regles:
+        if non_terminal in self.regles and regle not in self.regles[non_terminal]:
             self.regles[non_terminal].append(regle)
         else:
             self.regles[non_terminal] = [regle]
@@ -52,7 +52,7 @@ class Grammaire:
             line = line.strip()
             membre_gauche, membre_droit = line.split(":")
             membre_droit = [part.strip() for part in membre_droit.split("|")]
-            self.regles[membre_gauche.strip()] = [re.findall(fr'[A-Z][0-9]|[a-z]|{self.axiome}|E', symbol) for symbol in membre_droit]
+            self.regles[membre_gauche.strip()] = [re.findall(fr'[A-Z][0-9]|[a-z]|{self.axiome}|[A-Z]', symbol) for symbol in membre_droit]
 
     def suppression_axiome_membre_droit(self):
         regles = list(self.regles.items())
@@ -79,15 +79,50 @@ class Grammaire:
                         self.ajout_regle(new_non_terminal, [symbol])
                         self.regles[membre_gauche][i][j] = new_non_terminal
 
+    def iteration_suppression_epsilon(self):
+        terminaux_annule = set()
+
+        for membre_gauche, membre_droit in self.regles.items():
+            for regle in membre_droit:
+                for symbol in regle:
+                    if symbol == "E":
+                        if membre_gauche != self.axiome:
+                            terminaux_annule.add(membre_gauche)
+                            self.regles[membre_gauche].remove(regle)
+                            break
+        
+        for membre_gauche, membre_droit in self.regles.items():
+            for regle in membre_droit:
+                for i, symbol in enumerate(regle):
+                    if symbol in terminaux_annule:
+                        nouvelle_regle = regle[:i] + regle[i+1:]
+                        if len(nouvelle_regle) == 0:
+                            nouvelle_regle = ["E"]
+
+                        #print(f"MEMBRE GAUCHE: {membre_gauche}\nREGLE: {regle}\nNOUVELLE REGLE: {nouvelle_regle}\n")
+
+                        self.ajout_regle(membre_gauche, nouvelle_regle)
+                        break
+
+        print(f"TERMINAUX ANNULÉS: {terminaux_annule}\n")
+        print(f"FIN DE L'ITERATION\n{self.regles}\n")
+
+                        
+    def suppression_epsilon(self):
+        # Générer par GPT, permet de relancer itération par itération
+        while any(
+            regle == ["E"] and membre_gauche != self.axiome
+            for membre_gauche, membre_droit in self.regles.items()
+            for regle in membre_droit
+        ):
+            self.iteration_suppression_epsilon()
+    
     def simplification(self):
 
         # Retire l'axiome des membres droits des règles
         self.suppression_axiome_membre_droit()
         self.suppression_terminaux()
-
-
-
-
+        self.suppression_epsilon()
 
 if __name__ == "__main__":
     print("\033c")
@@ -100,14 +135,7 @@ if __name__ == "__main__":
         for i in range(1, 11):
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
 
-    grammaire_test.lire("test/test.general")
-    #print(grammaire_test.get_regles())
-    print()
-    grammaire_test.simplification()
-    #print()
-    print(grammaire_test.get_regles())
-    
-
+    grammaire_test.lire("test/suppression_epsilon.general")    
 
     ########################### SECTION TEST #############################
 
@@ -120,3 +148,9 @@ if __name__ == "__main__":
             membre_gauche, membre_droit = line.split(":")
             membre_droit = [part.strip() for part in membre_droit.split("|")]
             print(f'MEMBRE GAUCHE: {membre_gauche}\nMEMBRE DROIT: {membre_droit}\n')
+    
+    def test_suppression_epsilon(input):
+        grammaire_test.lire(input)
+        grammaire_test.suppression_epsilon()
+    
+    test_suppression_epsilon("test/suppression_epsilon.general")

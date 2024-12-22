@@ -1,0 +1,4 @@
+S : AbB | C
+B : AA | AC
+C : b | c 
+A : a | E
