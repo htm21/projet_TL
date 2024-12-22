@@ -19,6 +19,12 @@ class Grammaire:
     
     def get_regles(self):
         return self.regles
+
+    def get_non_terminal_non_utilise(self):
+        for non_terminal in self.non_terminaux:
+            if non_terminal not in self.regles.keys() and all(non_terminal not in regle for regle in self.regles.values()):
+                return non_terminal
+        return None
     
     def set_axiome(self, axiome):
         self.axiome = axiome
@@ -76,10 +82,7 @@ class Grammaire:
                     if symbol in self.terminaux:
 
                         if symbol not in association_terminal_non_terminal:
-                            for non_terminal in self.non_terminaux:
-                                if non_terminal not in association_terminal_non_terminal.values():
-                                    nouveau_non_terminal = non_terminal
-                                    break
+                            nouveau_non_terminal = self.get_non_terminal_non_utilise()
                             
                             association_terminal_non_terminal[symbol] = nouveau_non_terminal
 
@@ -117,7 +120,7 @@ class Grammaire:
         #print(f"FIN DE L'ITERATION\n{self.regles}\n")
               
     def suppression_epsilon(self):
-        # Générer par GPT, permet de relancer itération par itération
+        # Générer par GPT pour relancer tant que c'est nécessaire
         while any(
             regle == ["E"] and membre_gauche != self.axiome
             for membre_gauche, membre_droit in self.regles.items()
@@ -139,8 +142,48 @@ class Grammaire:
 
                     self.regles[membre_gauche].remove(regle)
 
+    
+    def iteration_suppression_regle_plus_deux_non_terminaux_membre_droite(self):
+        regles = list(self.regles.items()) 
+        print('-'*50)
+
+        for membre_gauche, membre_droit in regles:
+            nouvelles_regles = []  
+
+            for regle in membre_droit :  
+                nb_non_terminaux = sum(1 for symbol in regle if symbol in self.non_terminaux)
+                if nb_non_terminaux > 2 :
+                    compteur = 0
+                    for i, symbol in enumerate(regle):
+                        if symbol in self.non_terminaux and compteur < 2: 
+                            compteur += 1
+                            continue
+
+                        if compteur == 2:
+                            nouveau_non_terminal = self.get_non_terminal_non_utilise()
+                            regle_modif = regle[:i-1] + [nouveau_non_terminal]
+                            nouvelle_regle = regle[i-1:]
+
+                            self.ajout_regle(nouveau_non_terminal, nouvelle_regle)
+                            nouvelles_regles.append(regle_modif)
+
+                            print(f"\nANCIENNE REGLE: {regle}\nREGLE MODIF: {regle_modif}\nNOUVELLE REGLE: {nouvelle_regle}")
+                            break
+                else:
+                    nouvelles_regles.append(regle)
+
+            self.regles[membre_gauche] = nouvelles_regles
+        
+        print(f'\nREGLES: {self.regles}\n')
+    
     def suppression_regle_plus_deux_non_terminaux_membre_droite(self):
-        pass
+        # Générer par GPT pour relancer tant que c'est nécessaire
+        while any(
+            sum(1 for symbol in regle if symbol in self.non_terminaux) > 2
+            for membre_gauche, membre_droit in self.regles.items()
+            for regle in membre_droit
+        ):
+            self.iteration_suppression_regle_plus_deux_non_terminaux_membre_droite()
     
     def simplification(self):
 
@@ -152,6 +195,8 @@ class Grammaire:
         self.suppression_epsilon()
         # Supprime les règles unité X -> Y
         self.suppression_regle_unite()
+        # Supprime les règles avec plus de 2 non-terminaux dans le membre de droite
+        self.suppression_regle_plus_deux_non_terminaux_membre_droite()
 
 if __name__ == "__main__":
     print("\033c")
@@ -164,14 +209,14 @@ if __name__ == "__main__":
         for i in range(1, 11):
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
 
-    grammaire_test.lire("test/test.general")
-    print(f'AVANT: {grammaire_test.get_regles()}\n') 
-    grammaire_test.simplification()
-    print(f'APRÈS: {grammaire_test.get_regles()}\n')
-    
+    grammaire_test.lire("test/suppression_regle_longue_non_terminal.general")
+
+
+
     ########################### SECTION TEST #############################
 
     def test_lire(input):
+        print('\n--- TEST LECTURE ---\n')
         with open(input) as file:
             data = file.readlines()
 
@@ -180,6 +225,16 @@ if __name__ == "__main__":
             membre_gauche, membre_droit = line.split(":")
             membre_droit = [part.strip() for part in membre_droit.split("|")]
             print(f'MEMBRE GAUCHE: {membre_gauche}\nMEMBRE DROIT: {membre_droit}\n')
+
+    #test_lire("test/test_lecture.general")
+
+    def test_suppression_terminaux(input):
+        grammaire_test.lire(input)
+        print(f'AVANT: {grammaire_test.get_regles()}\n')
+        grammaire_test.suppression_terminaux()
+        print(f'APRES: {grammaire_test.get_regles()}\n')
+    
+    #test_suppression_terminaux("test/suppression_terminaux.general")
     
     def test_suppression_epsilon(input):
         grammaire_test.lire(input)
@@ -194,3 +249,11 @@ if __name__ == "__main__":
         print(f'APRÈS: {grammaire_test.get_regles()}\n')
     
     #test_suppression_regle_unite("test/suppression_regle_unite.general")
+
+    def test_suppression_regle_plus_deux_non_terminaux_membre_droite(input):
+        grammaire_test.lire(input)
+        print(f'AVANT: {grammaire_test.get_regles()}\n')
+        grammaire_test.suppression_regle_plus_deux_non_terminaux_membre_droite()
+        print(f'APRÈS: {grammaire_test.get_regles()}\n')
+    
+    #test_suppression_regle_plus_deux_non_terminaux_membre_droite("test/suppression_regle_longue_non_terminal.general")
