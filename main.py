@@ -125,12 +125,33 @@ class Grammaire:
         ):
             self.iteration_suppression_epsilon()
     
+    def suppression_regle_unite(self):
+        regles = list(self.regles.items())
+
+        for membre_gauche, membre_droit in regles:
+            for regle in membre_droit: 
+                if len(regle) == 1 and regle[0] in self.non_terminaux and regle[0] != membre_gauche:
+                    symbol = regle[0]
+
+                    for nouvelle_regle in self.regles[symbol]:
+                        if nouvelle_regle not in self.regles[membre_gauche]:
+                            self.ajout_regle(membre_gauche, nouvelle_regle)
+
+                    self.regles[membre_gauche].remove(regle)
+
+    def suppression_regle_plus_deux_non_terminaux_membre_droite(self):
+        pass
+    
     def simplification(self):
 
         # Retire l'axiome des membres droits des règles
         self.suppression_axiome_membre_droit()
+        # Remplace les terminaux par des non-terminaux
         self.suppression_terminaux()
+        # Supprime les epsilon des règles X -> E sauf pour l'axiome
         self.suppression_epsilon()
+        # Supprime les règles unité X -> Y
+        self.suppression_regle_unite()
 
 if __name__ == "__main__":
     print("\033c")
@@ -143,13 +164,11 @@ if __name__ == "__main__":
         for i in range(1, 11):
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
 
-    grammaire_test.lire("test/test.general")  
-
-    print(grammaire_test.get_regles())
-    print()
-    grammaire_test.simplification()  
-    print(grammaire_test.get_regles())
-
+    grammaire_test.lire("test/test.general")
+    print(f'AVANT: {grammaire_test.get_regles()}\n') 
+    grammaire_test.simplification()
+    print(f'APRÈS: {grammaire_test.get_regles()}\n')
+    
     ########################### SECTION TEST #############################
 
     def test_lire(input):
@@ -167,3 +186,11 @@ if __name__ == "__main__":
         grammaire_test.suppression_epsilon()
     
     #test_suppression_epsilon("test/suppression_epsilon.general")
+
+    def test_suppression_regle_unite(input):
+        grammaire_test.lire(input)
+        print(f'AVANT: {grammaire_test.get_regles()}\n')
+        grammaire_test.suppression_regle_unite()
+        print(f'APRÈS: {grammaire_test.get_regles()}\n')
+    
+    #test_suppression_regle_unite("test/suppression_regle_unite.general")
