@@ -145,7 +145,7 @@ class Grammaire:
     
     def iteration_suppression_regle_plus_deux_non_terminaux_membre_droite(self):
         regles = list(self.regles.items()) 
-        print('-'*50)
+        #print('-'*50)
 
         for membre_gauche, membre_droit in regles:
             nouvelles_regles = []  
@@ -167,15 +167,13 @@ class Grammaire:
                             self.ajout_regle(nouveau_non_terminal, nouvelle_regle)
                             nouvelles_regles.append(regle_modif)
 
-                            print(f"\nANCIENNE REGLE: {regle}\nREGLE MODIF: {regle_modif}\nNOUVELLE REGLE: {nouvelle_regle}")
+                            #print(f"\nANCIENNE REGLE: {regle}\nREGLE MODIF: {regle_modif}\nNOUVELLE REGLE: {nouvelle_regle}")
                             break
                 else:
                     nouvelles_regles.append(regle)
 
             self.regles[membre_gauche] = nouvelles_regles
-        
-        print(f'\nREGLES: {self.regles}\n')
-    
+            
     def suppression_regle_plus_deux_non_terminaux_membre_droite(self):
         # Générer par GPT pour relancer tant que c'est nécessaire
         while any(
