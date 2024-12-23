@@ -213,8 +213,11 @@ class Grammaire:
         if self.est_algébrique() :
             self.suppression_axiome_membre_droit()
             self.suppression_terminaux()
+            self.suppression_regle_plus_deux_non_terminaux_membre_droite()
+            self.suppression_epsilon()
+            self.suppression_regle_unite()
 
-    ################################## SECTION TESTS #################################
+    ################################## SECTION PRINCIPALE #################################
 
 if __name__ == "__main__":
     print("\033c")
@@ -228,7 +231,9 @@ if __name__ == "__main__":
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
 
 
-    # TESTS
+
+    ################################## SECTION TEST #################################
+
     def test_lire(input):
         print('\n--- TEST LECTURE ---\n')
         with open(input) as file:
@@ -300,4 +305,4 @@ if __name__ == "__main__":
         print('\n--- APRES CHOMSKY ---\n')
         grammaire_test.afficher_productions()
 
-    #test_transformation_chomsky("test/transformation.general")
+    test_transformation_chomsky("test/transformation.general")
