@@ -219,7 +219,6 @@ if __name__ == "__main__":
         for i in range(1, 11):
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
 
-    grammaire_test.lire("test/t2.general")
 
     ########################### SECTION TEST #############################
 
