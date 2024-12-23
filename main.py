@@ -196,6 +196,18 @@ class Grammaire:
         # Supprime les règles avec plus de 2 non-terminaux dans le membre de droite
         self.suppression_regle_plus_deux_non_terminaux_membre_droite()
 
+    def transformation_greibach(self):
+        ''' Algorithme de Greibach en bêta pour l'instant :
+            il faut implémenter la suppression des non-terminaux en tetes de règles
+            Marche correctement pour ces deux premières étapes'''
+        
+        if self.est_algébrique():
+            # Retire l'axiome des membres droits des règles
+            self.suppression_axiome_membre_droit()
+            # Supprime les règles X -> E sauf pour l'axiome
+            self.suppression_epsilon()
+
+
 if __name__ == "__main__":
     print("\033c")
     grammaire_test = Grammaire()
@@ -207,9 +219,7 @@ if __name__ == "__main__":
         for i in range(1, 11):
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
 
-    grammaire_test.lire("test/suppression_regle_longue_non_terminal.general")
-
-
+    grammaire_test.lire("test/t2.general")
 
     ########################### SECTION TEST #############################
 
@@ -255,3 +265,11 @@ if __name__ == "__main__":
         print(f'APRÈS: {grammaire_test.get_regles()}\n')
     
     #test_suppression_regle_plus_deux_non_terminaux_membre_droite("test/suppression_regle_longue_non_terminal.general")
+
+    def test_transformation_greibach(input):
+        grammaire_test.lire(input)
+        print(f'AVANT: {grammaire_test.get_regles()}\n')
+        grammaire_test.transformation_greibach()
+        print(f'APRÈS: {grammaire_test.get_regles()}\n')
+    
+    #test_transformation_greibach("test/transformation_greibach.general")
