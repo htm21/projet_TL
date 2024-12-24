@@ -1,33 +1,39 @@
 import re
+from collections import deque
 
 class Grammaire:
     def __init__(self):
-        self.axiome = "S"
-        self.terminaux = set()
-        self.non_terminaux = {self.axiome}
-        self.regles = {}
+        self.__axiome = "S"
+        self.__terminaux = set()
+        self.__non_terminaux = {self.axiome}
+        self.__regles = {}
 
     # Getters et Setters
     def get_terminaux(self):
-        return self.terminaux
+        return self.__terminaux
     
     def get_non_terminaux(self):
-        return self.non_terminaux
+        return self.__non_terminaux
     
     def get_axiome(self):
-        return self.axiome
+        return self.__axiome
     
     def get_regles(self):
-        return self.regles
+        return self.__regles
 
     def get_non_terminal_non_utilise(self):
         for non_terminal in self.non_terminaux:
             if non_terminal not in self.regles.keys() and all(non_terminal not in regle for regle in self.regles.values()):
                 return non_terminal
         return None
-    
     def set_axiome(self, axiome):
         self.axiome = axiome
+        
+    terminaux = property(get_terminaux)
+    non_terminaux = property(get_non_terminaux)
+    axiome = property(get_axiome, set_axiome)
+    regles = property(get_regles)
+
     
     # Ajout des terminaux, non-terminaux et règles
     def ajout_terminal(self, terminal):
@@ -216,6 +222,34 @@ class Grammaire:
             self.suppression_regle_plus_deux_non_terminaux_membre_droite()
             self.suppression_epsilon()
             self.suppression_regle_unite()
+    ################################## SECTION ENUMERATION #################################
+    def generer_mots(self, longueur_max):
+
+        mots = set()
+        queue = deque([(self.axiome, "")])
+
+        while queue:
+            non_terminal, prefixe = queue.popleft()
+
+            if len(prefixe) > longueur_max:
+                continue
+
+            for regle in self.regles.get(non_terminal, []):
+                nouveau_mot = prefixe
+                termine = True
+
+                for symbole in regle:
+                    if symbole in self.non_terminaux:
+                        queue.append((symbole, nouveau_mot))
+                        termine = False
+                    else:
+                        nouveau_mot += symbole
+
+                if termine and len(nouveau_mot) <= longueur_max:
+                    mots.add(nouveau_mot)
+
+        return sorted([mot for mot in mots])
+
 
     ################################## SECTION PRINCIPALE #################################
 
@@ -297,12 +331,3 @@ if __name__ == "__main__":
     
     #test_transformation_greibach("test/transformation.general")
 
-    def test_transformation_chomsky(input):
-        grammaire_test.lire(input)
-        print('--- TEST CHOMSKY ---\n')
-        grammaire_test.afficher_productions()
-        grammaire_test.transformation_chomsky()
-        print('\n--- APRES CHOMSKY ---\n')
-        grammaire_test.afficher_productions()
-
-    test_transformation_chomsky("test/transformation.general")
