@@ -251,32 +251,29 @@ class Grammaire:
 
     ################################## SECTION ENUMERATION #################################
 
-    def generer_mots(self, longueur_max):
+    def contient_que_des_terminaux(self, w):
+        return all(symbol in self.terminaux for symbol in w)
 
-        mots = set()
-        queue = deque([(self.axiome, "")])
+    def enumere_mots(self, n, w, langage) :
 
-        while queue:
-            non_terminal, prefixe = queue.popleft()
+        if len(w) > n :
+            return
+        
+        if self.contient_que_des_terminaux(w) :
+            langage.add("".join(w))
+            return
+        
+        for i in range(len(w)) :
+            if w[i] in self.non_terminaux :
+                for w3 in self.regles[w[i]] :
+                    w2 = w[:i] + w3 + w[i+1:]
 
-            if len(prefixe) > longueur_max:
-                continue
-
-            for regle in self.regles.get(non_terminal, []):
-                nouveau_mot = prefixe
-                termine = True
-
-                for symbole in regle:
-                    if symbole in self.non_terminaux:
-                        queue.append((symbole, nouveau_mot))
-                        termine = False
-                    else:
-                        nouveau_mot += symbole
-
-                if termine and len(nouveau_mot) <= longueur_max:
-                    mots.add(nouveau_mot)
-
-        return sorted([mot for mot in mots])
+                    self.enumere_mots(n, w2, langage)
+    
+    def enumere_mots_langage(self, n) :
+        langage = set()
+        self.enumere_mots(n, [self.axiome], langage)
+        return sorted(langage, key=len)
 
 
     ################################## SECTION PRINCIPALE #################################
@@ -284,14 +281,29 @@ class Grammaire:
 if __name__ == "__main__":
     print("\033c")
     grammaire_test = Grammaire()
+    grammaire_test2 = Grammaire()
 
     # Ajout des non-terminaux et terminaux
     alphabet = "ABCDFGHIJKLMNOPQRSTUVWXYZ"
     for letter in alphabet :
         grammaire_test.ajout_terminal(letter.lower())
+        grammaire_test2.ajout_terminal(letter.lower())
         for i in range(1, 11):
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
+            grammaire_test2.ajout_non_terminal(f"{letter}{i}")
 
+    grammaire_test.lire("test/transformation1.general")
+    grammaire_test2.lire("test/transformation1.general")
+    grammaire_test.transformation_greibach()
+    grammaire_test2.transformation_chomsky()
+    
+    n = 5
+    a = grammaire_test.enumere_mots_langage(n)
+    b = grammaire_test2.enumere_mots_langage(n)
+
+    print(f"Langage de la grammaire en forme normale de Greibach : {a}\n")
+    print(f"Langage de la grammaire en forme normale de Chomsky : {b}\n")
+    print(f"Les deux langages sont-ils égaux ? {a == b}\n")
 
 
     ################################## SECTION TEST #################################
