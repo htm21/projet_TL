@@ -273,7 +273,7 @@ class Grammaire:
     def enumere_mots_langage(self, n) :
         langage = set()
         self.enumere_mots(n, [self.axiome], langage)
-        return sorted(langage, key=len)
+        return sorted(langage, key=lambda x: (len(x), x))
 
 
     ################################## SECTION PRINCIPALE #################################
@@ -388,5 +388,5 @@ if __name__ == "__main__":
         print(f"Les mots générés par la forme normale de Greibach : {a}\n")
         print(f"Les mots générés par la forme normale de Chomsky : {b}\n")
         print(f"Les deux formes génèrent les mêmes mots : {a == b}\n")
-        
-    test_enumere_mots_langage("test/transformation1.general", 6)
+
+    #test_enumere_mots_langage("test/transformation1.general", 7)        
