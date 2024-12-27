@@ -27,7 +27,7 @@ class Grammaire:
                 return non_terminal
         return None
     def set_axiome(self, axiome):
-        self.axiome = axiome
+        self.__axiome = axiome
         
     terminaux = property(get_terminaux)
     non_terminaux = property(get_non_terminaux)
@@ -118,10 +118,10 @@ class Grammaire:
                         if len(nouvelle_regle) == 0:
                             nouvelle_regle = ["E"]
 
-                        #print(f"MEMBRE GAUCHE: {membre_gauche}\nREGLE: {regle}\nNOUVELLE REGLE: {nouvelle_regle}\n")
-
-                        self.ajout_regle(membre_gauche, nouvelle_regle)
-                        break
+                        if nouvelle_regle not in self.regles[membre_gauche]:
+                            self.ajout_regle(membre_gauche, nouvelle_regle)
+                            #print(f"NOUVELLE REGLE: {nouvelle_regle} AJOUTEE A {membre_gauche}\n")
+                        
 
         #print(f"TERMINAUX ANNULÉS: {terminaux_annule}\n")
         #print(f"FIN DE L'ITERATION\n{self.regles}\n")
@@ -204,19 +204,16 @@ class Grammaire:
             self.regles[non_terminal] = nouvelles_regles
 
     def suppression_terminaux_non_en_tete(self):
-        for non_terminal, regles in list(self.regles.items()):
-            nouvelles_regles = []
+        regles = list(self.regles.items())
 
-            for regle in regles:
-                if regle[0] in self.terminaux:
-                    nouveau_non_terminal = self.get_non_terminal_non_utilise()
-                    self.ajout_non_terminal(nouveau_non_terminal)
-                    self.ajout_regle(nouveau_non_terminal, regle[1:])
-                    nouvelles_regles.append([regle[0], nouveau_non_terminal])
-                else:
-                    nouvelles_regles.append(regle)
-
-            self.regles[non_terminal] = nouvelles_regles
+        for membre_gauche, membre_droit in regles:
+            for regle in membre_droit :
+                for i, symbol in enumerate(regle) :
+                    if symbol in self.terminaux and i > 0:
+                        nouveau_non_terminal = self.get_non_terminal_non_utilise()
+                        self.ajout_non_terminal(nouveau_non_terminal)
+                        self.ajout_regle(nouveau_non_terminal, [symbol])
+                        regle[i] = nouveau_non_terminal
 
 
     def afficher_productions(self):
@@ -233,9 +230,7 @@ class Grammaire:
     ################################## SECTION TRANSFORMATION #################################
 
     def transformation_greibach(self):
-        ''' Algorithme de Greibach en bêta pour l'instant :
-            il faut w² la suppression des non-terminaux en tetes de règles
-            Marche correctement pour ces deux premières étapes'''
+        '''Forme normale de Greibach'''
         
         if self.est_algébrique():
             self.suppression_axiome_membre_droit()
@@ -245,6 +240,7 @@ class Grammaire:
             self.suppression_terminaux_non_en_tete()
             
     def transformation_chomsky(self):
+        '''Forme normale de Chomsky'''
 
         if self.est_algébrique() :
             self.suppression_axiome_membre_droit()
@@ -252,37 +248,32 @@ class Grammaire:
             self.suppression_regle_plus_deux_non_terminaux_membre_droite()
             self.suppression_epsilon()
             self.suppression_regle_unite()
+
     ################################## SECTION ENUMERATION #################################
-    def generer_mots(self, longueur_max):
 
-        mots = set()
-        queue = deque([(self.axiome, "")])
+    def contient_que_des_terminaux(self, w):
+        return all(symbol in self.terminaux for symbol in w)
 
-        while queue:
-            non_terminal, prefixe = queue.popleft()
+    def enumere_mots(self, n, w, langage) :
 
-            if len(prefixe) > longueur_max:
-                continue
+        if len(w) > n :
+            return
+        
+        if self.contient_que_des_terminaux(w) :
+            langage.add("".join(w))
+            return
+        
+        for i in range(len(w)) :
+            if w[i] in self.non_terminaux :
+                for w3 in self.regles[w[i]] :
+                    w2 = w[:i] + w3 + w[i+1:]
 
-            for regle in self.regles.get(non_terminal, []):
-                nouveau_mot = prefixe
-                termine = True
-
-                for symbole in regle:
-                    if symbole in self.non_terminaux:
-                        queue.append((symbole, nouveau_mot))
-                        termine = False
-                    else:
-                        nouveau_mot += symbole
-
-                if termine and len(nouveau_mot) <= longueur_max:
-                    mots.add(nouveau_mot)
-
-                for letter in nouveau_mot:
-                    if letter.islower():
-                        continue
-                break
-        return sorted([mot for mot in mots])
+                    self.enumere_mots(n, w2, langage)
+    
+    def enumere_mots_langage(self, n) :
+        langage = set()
+        self.enumere_mots(n, [self.axiome], langage)
+        return sorted(langage, key=len)
 
 
     ################################## SECTION PRINCIPALE #################################
@@ -290,13 +281,16 @@ class Grammaire:
 if __name__ == "__main__":
     print("\033c")
     grammaire_test = Grammaire()
+    grammaire_test2 = Grammaire()
 
     # Ajout des non-terminaux et terminaux
     alphabet = "ABCDFGHIJKLMNOPQRSTUVWXYZ"
     for letter in alphabet :
         grammaire_test.ajout_terminal(letter.lower())
+        grammaire_test2.ajout_terminal(letter.lower())
         for i in range(1, 11):
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
+            grammaire_test2.ajout_non_terminal(f"{letter}{i}")
 
 
 
@@ -357,10 +351,42 @@ if __name__ == "__main__":
 
     def test_transformation_greibach(input):
         grammaire_test.lire(input)
-        print('--- TEST GREIBACH ---\n')
+        num_regle = input.split(".")[0][-1]
+        print(f'--- TEST GREIBACH n°{num_regle} ---\n')
         grammaire_test.afficher_productions()
         grammaire_test.transformation_greibach()
         print('\n--- APRES GREIBACH ---\n')
         grammaire_test.afficher_productions()
+        print()
     
-    #test_transformation_greibach("test/transformation.general")
+    #test_transformation_greibach("test/transformation1.general")
+    #test_transformation_greibach("test/transformation2.general")
+
+    def test_transformation_chomsky(input):
+        grammaire_test.lire(input)
+        num_regle = input.split(".")[0][-1]
+        print(f'--- TEST CHOMSKY n°{num_regle} ---\n')
+        grammaire_test.afficher_productions()
+        grammaire_test.transformation_chomsky()
+        print('\n--- APRES CHOMSKY ---\n')
+        grammaire_test.afficher_productions()
+        print()
+    
+    #test_transformation_chomsky("test/transformation1.general")
+    #test_transformation_chomsky("test/transformation2.general")
+
+    def test_enumere_mots_langage(input, n):
+        print("--- TEST ENUMERATION ---\n")
+        grammaire_test.lire(input)
+        grammaire_test2.lire(input)
+        grammaire_test.transformation_greibach()
+        grammaire_test2.transformation_chomsky()
+    
+        a = grammaire_test.enumere_mots_langage(n)
+        b = grammaire_test2.enumere_mots_langage(n)
+
+        print(f"Les mots générés par la forme normale de Greibach : {a}\n")
+        print(f"Les mots générés par la forme normale de Chomsky : {b}\n")
+        print(f"Les deux formes génèrent les mêmes mots : {a == b}\n")
+        
+    test_enumere_mots_langage("test/transformation1.general", 6)
