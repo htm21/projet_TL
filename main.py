@@ -230,7 +230,9 @@ class Grammaire:
     ################################## SECTION TRANSFORMATION #################################
 
     def transformation_greibach(self):
-        '''Forme normale de Greibach'''
+        ''' Algorithme de Greibach en bêta pour l'instant :
+            il faut implémenter la suppression des non-terminaux en tetes de règles
+            Marche correctement pour ces deux premières étapes'''
         
         if self.est_algébrique():
             self.suppression_axiome_membre_droit()
@@ -250,30 +252,32 @@ class Grammaire:
             self.suppression_regle_unite()
 
     ################################## SECTION ENUMERATION #################################
+    def generer_mots(self, longueur_max):
 
-    def contient_que_des_terminaux(self, w):
-        return all(symbol in self.terminaux for symbol in w)
+        mots = set()
+        queue = deque([(self.axiome, "")])
 
-    def enumere_mots(self, n, w, langage) :
+        while queue:
+            non_terminal, prefixe = queue.popleft()
 
-        if len(w) > n :
-            return
-        
-        if self.contient_que_des_terminaux(w) :
-            langage.add("".join(w))
-            return
-        
-        for i in range(len(w)) :
-            if w[i] in self.non_terminaux :
-                for w3 in self.regles[w[i]] :
-                    w2 = w[:i] + w3 + w[i+1:]
+            if len(prefixe) > longueur_max:
+                continue
 
-                    self.enumere_mots(n, w2, langage)
-    
-    def enumere_mots_langage(self, n) :
-        langage = set()
-        self.enumere_mots(n, [self.axiome], langage)
-        return sorted(langage, key=len)
+            for regle in self.regles.get(non_terminal, []):
+                nouveau_mot = prefixe
+                termine = True
+
+                for symbole in regle:
+                    if symbole in self.non_terminaux:
+                        queue.append((symbole, nouveau_mot))
+                        termine = False
+                    else:
+                        nouveau_mot += symbole
+
+                if termine and len(nouveau_mot) <= longueur_max:
+                    mots.add(nouveau_mot)
+
+        return sorted([mot for mot in mots])
 
 
     ################################## SECTION PRINCIPALE #################################
