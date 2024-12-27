@@ -234,7 +234,7 @@ class Grammaire:
 
     def transformation_greibach(self):
         ''' Algorithme de Greibach en bêta pour l'instant :
-            il faut implémenter la suppression des non-terminaux en tetes de règles
+            il faut w² la suppression des non-terminaux en tetes de règles
             Marche correctement pour ces deux premières étapes'''
         
         if self.est_algébrique():
@@ -278,6 +278,10 @@ class Grammaire:
                 if termine and len(nouveau_mot) <= longueur_max:
                     mots.add(nouveau_mot)
 
+                for letter in nouveau_mot:
+                    if letter.islower():
+                        continue
+                break
         return sorted([mot for mot in mots])
 
 
