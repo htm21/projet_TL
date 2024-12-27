@@ -230,9 +230,7 @@ class Grammaire:
     ################################## SECTION TRANSFORMATION #################################
 
     def transformation_greibach(self):
-        ''' Algorithme de Greibach en bêta pour l'instant :
-            il faut implémenter la suppression des non-terminaux en tetes de règles
-            Marche correctement pour ces deux premières étapes'''
+        '''Forme normale de Greibach'''
         
         if self.est_algébrique():
             self.suppression_axiome_membre_droit()
@@ -252,32 +250,30 @@ class Grammaire:
             self.suppression_regle_unite()
 
     ################################## SECTION ENUMERATION #################################
-    def generer_mots(self, longueur_max):
 
-        mots = set()
-        queue = deque([(self.axiome, "")])
+    def contient_que_des_terminaux(self, w):
+        return all(symbol in self.terminaux for symbol in w)
 
-        while queue:
-            non_terminal, prefixe = queue.popleft()
+    def enumere_mots(self, n, w, langage) :
 
-            if len(prefixe) > longueur_max:
-                continue
+        if len(w) > n :
+            return
+        
+        if self.contient_que_des_terminaux(w) :
+            langage.add("".join(w))
+            return
+        
+        for i in range(len(w)) :
+            if w[i] in self.non_terminaux :
+                for w3 in self.regles[w[i]] :
+                    w2 = w[:i] + w3 + w[i+1:]
 
-            for regle in self.regles.get(non_terminal, []):
-                nouveau_mot = prefixe
-                termine = True
-
-                for symbole in regle:
-                    if symbole in self.non_terminaux:
-                        queue.append((symbole, nouveau_mot))
-                        termine = False
-                    else:
-                        nouveau_mot += symbole
-
-                if termine and len(nouveau_mot) <= longueur_max:
-                    mots.add(nouveau_mot)
-
-        return sorted([mot for mot in mots])
+                    self.enumere_mots(n, w2, langage)
+    
+    def enumere_mots_langage(self, n) :
+        langage = set()
+        self.enumere_mots(n, [self.axiome], langage)
+        return sorted(langage, key=len)
 
 
     ################################## SECTION PRINCIPALE #################################
@@ -296,18 +292,6 @@ if __name__ == "__main__":
             grammaire_test.ajout_non_terminal(f"{letter}{i}")
             grammaire_test2.ajout_non_terminal(f"{letter}{i}")
 
-    grammaire_test.lire("test/transformation1.general")
-    grammaire_test2.lire("test/transformation1.general")
-    grammaire_test.transformation_greibach()
-    grammaire_test2.transformation_chomsky()
-    
-    n = 5
-    a = grammaire_test.enumere_mots_langage(n)
-    b = grammaire_test2.enumere_mots_langage(n)
-
-    print(f"Langage de la grammaire en forme normale de Greibach : {a}\n")
-    print(f"Langage de la grammaire en forme normale de Chomsky : {b}\n")
-    print(f"Les deux langages sont-ils égaux ? {a == b}\n")
 
 
     ################################## SECTION TEST #################################
@@ -391,4 +375,18 @@ if __name__ == "__main__":
     #test_transformation_chomsky("test/transformation1.general")
     #test_transformation_chomsky("test/transformation2.general")
 
+    def test_enumere_mots_langage(input, n):
+        print("--- TEST ENUMERATION ---\n")
+        grammaire_test.lire(input)
+        grammaire_test2.lire(input)
+        grammaire_test.transformation_greibach()
+        grammaire_test2.transformation_chomsky()
+    
+        a = grammaire_test.enumere_mots_langage(n)
+        b = grammaire_test2.enumere_mots_langage(n)
 
+        print(f"Les mots générés par la forme normale de Greibach : {a}\n")
+        print(f"Les mots générés par la forme normale de Chomsky : {b}\n")
+        print(f"Les deux formes génèrent les mêmes mots : {a == b}\n")
+        
+    test_enumere_mots_langage("test/transformation1.general", 6)
