@@ -27,7 +27,7 @@ class Grammaire:
                 return non_terminal
         return None
     def set_axiome(self, axiome):
-        self.axiome = axiome
+        self.__axiome = axiome
         
     terminaux = property(get_terminaux)
     non_terminaux = property(get_non_terminaux)
@@ -118,10 +118,10 @@ class Grammaire:
                         if len(nouvelle_regle) == 0:
                             nouvelle_regle = ["E"]
 
-                        #print(f"MEMBRE GAUCHE: {membre_gauche}\nREGLE: {regle}\nNOUVELLE REGLE: {nouvelle_regle}\n")
-
-                        self.ajout_regle(membre_gauche, nouvelle_regle)
-                        break
+                        if nouvelle_regle not in self.regles[membre_gauche]:
+                            self.ajout_regle(membre_gauche, nouvelle_regle)
+                            #print(f"NOUVELLE REGLE: {nouvelle_regle} AJOUTEE A {membre_gauche}\n")
+                        
 
         #print(f"TERMINAUX ANNULÉS: {terminaux_annule}\n")
         #print(f"FIN DE L'ITERATION\n{self.regles}\n")
@@ -204,19 +204,16 @@ class Grammaire:
             self.regles[non_terminal] = nouvelles_regles
 
     def suppression_terminaux_non_en_tete(self):
-        for non_terminal, regles in list(self.regles.items()):
-            nouvelles_regles = []
+        regles = list(self.regles.items())
 
-            for regle in regles:
-                if regle[0] in self.terminaux:
-                    nouveau_non_terminal = self.get_non_terminal_non_utilise()
-                    self.ajout_non_terminal(nouveau_non_terminal)
-                    self.ajout_regle(nouveau_non_terminal, regle[1:])
-                    nouvelles_regles.append([regle[0], nouveau_non_terminal])
-                else:
-                    nouvelles_regles.append(regle)
-
-            self.regles[non_terminal] = nouvelles_regles
+        for membre_gauche, membre_droit in regles:
+            for regle in membre_droit :
+                for i, symbol in enumerate(regle) :
+                    if symbol in self.terminaux and i > 0:
+                        nouveau_non_terminal = self.get_non_terminal_non_utilise()
+                        self.ajout_non_terminal(nouveau_non_terminal)
+                        self.ajout_regle(nouveau_non_terminal, [symbol])
+                        regle[i] = nouveau_non_terminal
 
 
     def afficher_productions(self):
@@ -233,9 +230,7 @@ class Grammaire:
     ################################## SECTION TRANSFORMATION #################################
 
     def transformation_greibach(self):
-        ''' Algorithme de Greibach en bêta pour l'instant :
-            il faut implémenter la suppression des non-terminaux en tetes de règles
-            Marche correctement pour ces deux premières étapes'''
+        '''Forme normale de Greibach'''
         
         if self.est_algébrique():
             self.suppression_axiome_membre_droit()
@@ -245,6 +240,7 @@ class Grammaire:
             self.suppression_terminaux_non_en_tete()
             
     def transformation_chomsky(self):
+        '''Forme normale de Chomsky'''
 
         if self.est_algébrique() :
             self.suppression_axiome_membre_droit()
@@ -252,7 +248,9 @@ class Grammaire:
             self.suppression_regle_plus_deux_non_terminaux_membre_droite()
             self.suppression_epsilon()
             self.suppression_regle_unite()
+
     ################################## SECTION ENUMERATION #################################
+
     def generer_mots(self, longueur_max):
 
         mots = set()
@@ -353,11 +351,28 @@ if __name__ == "__main__":
 
     def test_transformation_greibach(input):
         grammaire_test.lire(input)
-        print('--- TEST GREIBACH ---\n')
+        num_regle = input.split(".")[0][-1]
+        print(f'--- TEST GREIBACH n°{num_regle} ---\n')
         grammaire_test.afficher_productions()
         grammaire_test.transformation_greibach()
         print('\n--- APRES GREIBACH ---\n')
         grammaire_test.afficher_productions()
+        print()
     
-    #test_transformation_greibach("test/transformation.general")
+    #test_transformation_greibach("test/transformation1.general")
+    #test_transformation_greibach("test/transformation2.general")
+
+    def test_transformation_chomsky(input):
+        grammaire_test.lire(input)
+        num_regle = input.split(".")[0][-1]
+        print(f'--- TEST CHOMSKY n°{num_regle} ---\n')
+        grammaire_test.afficher_productions()
+        grammaire_test.transformation_chomsky()
+        print('\n--- APRES CHOMSKY ---\n')
+        grammaire_test.afficher_productions()
+        print()
+    
+    #test_transformation_chomsky("test/transformation1.general")
+    #test_transformation_chomsky("test/transformation2.general")
+
 
