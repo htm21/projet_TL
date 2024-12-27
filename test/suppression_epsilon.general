@@ -1,4 +1,4 @@
-S : AbB | C
-B : AA | AC
-C : b | c 
-A : a | E
+S : A1bB1 | C1
+B1 : A1A1 | A1C1
+C1 : b | c 
+A1 : a | E
