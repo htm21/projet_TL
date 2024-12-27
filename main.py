@@ -191,41 +191,30 @@ class Grammaire:
             self.iteration_suppression_regle_plus_deux_non_terminaux_membre_droite()
 
     def suppression_non_terminaux_en_tete(self):
-
-        for non_terminal in list(self.regles.keys()):
-            nouvelles_regles = []
-
-            for regle in self.regles[non_terminal]:
-                if regle[0].islower():
-                    nouvelles_regles.append(regle)
-                elif regle[0].isupper():
-                    premier_non_terminal = regle[0]
-                    reste_regle = regle[1:] 
-
-                    for regle_remplacement in self.regles.get(premier_non_terminal, []):
-                        nouvelles_regles.append(regle_remplacement + reste_regle)
-
-            nouvelles_regles = [list(x) for x in set(tuple(r) for r in nouvelles_regles)]
-            self.regles[non_terminal] = nouvelles_regles
-    def suppression_terminaux_non_en_tete(self):
-        terminal_to_non_terminal = {}
-
         for non_terminal, regles in list(self.regles.items()):
             nouvelles_regles = []
 
             for regle in regles:
-                nouvelle_regle = []
-                for symbole in regle:
-                    if symbole in self.terminaux and symbole != regle[0]:
-                        if symbole not in terminal_to_non_terminal:
-                            nouveau_non_terminal = self.get_non_terminal_non_utilise()
-                            self.ajout_non_terminal(nouveau_non_terminal)
-                            self.ajout_regle(nouveau_non_terminal, [symbole])
-                            terminal_to_non_terminal[symbole] = nouveau_non_terminal
-                        nouvelle_regle.append(terminal_to_non_terminal[symbole])
-                    else:
-                        nouvelle_regle.append(symbole)
-                nouvelles_regles.append(nouvelle_regle)
+                if regle[0] in self.non_terminaux:
+                    for nouvelle_regle in self.regles[regle[0]]:
+                        nouvelles_regles.append(nouvelle_regle + regle[1:])
+                else:
+                    nouvelles_regles.append(regle)
+
+            self.regles[non_terminal] = nouvelles_regles
+
+    def suppression_terminaux_non_en_tete(self):
+        for non_terminal, regles in list(self.regles.items()):
+            nouvelles_regles = []
+
+            for regle in regles:
+                if regle[0] in self.terminaux:
+                    nouveau_non_terminal = self.get_non_terminal_non_utilise()
+                    self.ajout_non_terminal(nouveau_non_terminal)
+                    self.ajout_regle(nouveau_non_terminal, regle[1:])
+                    nouvelles_regles.append([regle[0], nouveau_non_terminal])
+                else:
+                    nouvelles_regles.append(regle)
 
             self.regles[non_terminal] = nouvelles_regles
 
