@@ -220,7 +220,11 @@ class Grammaire:
                         self.ajout_non_terminal(nouveau_non_terminal)
                         self.ajout_regle(nouveau_non_terminal, [symbol])
                         regle[i] = nouveau_non_terminal
-
+    def to_file(self, file):
+        with open(file, "w") as file:
+            for membre_gauche, membre_droit in self.regles.items():
+                membre_droit = " | ".join([" ".join(part) for part in membre_droit])
+                file.write(f"{membre_gauche} : {membre_droit}\n")
 
     def afficher_productions(self):
         """
