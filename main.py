@@ -7,6 +7,12 @@ class Grammaire:
         self.__terminaux = set()
         self.__non_terminaux = {self.axiome}
         self.__regles = {}
+        alphabet = "ABCDFGHIJKLMNOPQRSTUVWXYZ"
+        for letter in alphabet:
+            self.ajout_terminal(letter.lower())
+            for i in range(1, 11):
+                self.ajout_non_terminal(f"{letter}{i}")
+
 
     # Getters et Setters
     def get_terminaux(self):
@@ -307,7 +313,7 @@ if __name__ == "__main__":
             membre_droit = [part.strip() for part in membre_droit.split("|")]
             print(f'MEMBRE GAUCHE: {membre_gauche}\nMEMBRE DROIT: {membre_droit}\n')
 
-    #test_lire("test/test_lecture.general")
+    test_lire("test/test_lecture.general")
 
     def test_suppression_terminaux(input):
         grammaire_test.lire(input)
@@ -317,7 +323,7 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION TERMINAUX\n')
         grammaire_test.afficher_productions()
 
-    #test_suppression_terminaux("test/suppression_terminaux.general")
+    test_suppression_terminaux("test/suppression_terminaux.general")
     
     def test_suppression_epsilon(input):
         grammaire_test.lire(input)
@@ -327,7 +333,7 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION EPSILON\n')
         grammaire_test.afficher_productions()
     
-    #test_suppression_epsilon("test/suppression_epsilon.general")
+    test_suppression_epsilon("test/suppression_epsilon.general")
 
     def test_suppression_regle_unite(input):
         grammaire_test.lire(input)
@@ -337,7 +343,7 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION REGLE UNITE\n')
         grammaire_test.afficher_productions()
     
-    #test_suppression_regle_unite("test/suppression_regle_unite.general")
+    test_suppression_regle_unite("test/suppression_regle_unite.general")
 
     def test_suppression_regle_plus_deux_non_terminaux_membre_droite(input):
         grammaire_test.lire(input)
@@ -347,7 +353,7 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION REGLE PLUS DE DEUX NON TERMINAUX MEMBRE DROITE\n')
         grammaire_test.afficher_productions()
     
-    #test_suppression_regle_plus_deux_non_terminaux_membre_droite("test/suppression_regle_longue_non_terminal.general")
+    test_suppression_regle_plus_deux_non_terminaux_membre_droite("test/suppression_regle_longue_non_terminal.general")
 
     def test_transformation_greibach(input):
         grammaire_test.lire(input)
@@ -372,8 +378,8 @@ if __name__ == "__main__":
         grammaire_test.afficher_productions()
         print()
     
-    #test_transformation_chomsky("test/transformation1.general")
-    #test_transformation_chomsky("test/transformation2.general")
+    test_transformation_chomsky("test/transformation1.general")
+    test_transformation_chomsky("test/transformation2.general")
 
     def test_enumere_mots_langage(input, n):
         print("--- TEST ENUMERATION ---\n")
@@ -389,4 +395,4 @@ if __name__ == "__main__":
         print(f"Les mots générés par la forme normale de Chomsky : {b}\n")
         print(f"Les deux formes génèrent les mêmes mots : {a == b}\n")
 
-    #test_enumere_mots_langage("test/transformation1.general", 7)        
+    #test_enumere_mots_langage("test/transformation2.general", 7)        

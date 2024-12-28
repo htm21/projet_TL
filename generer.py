@@ -1,0 +1,35 @@
+import sys
+from main import Grammaire
+
+def main():
+    if len(sys.argv) != 3:
+        print("Usage: python3 generer.py <nombre_max_mots> <fichier_grammaire>")
+        sys.exit(1)
+
+    try:
+        nombre_max_mots = int(sys.argv[1])
+        fichier_grammaire = sys.argv[2]
+
+        grammaire = Grammaire()
+        grammaire.lire(fichier_grammaire)
+
+        print("\033c")
+        print("Grammaire lue :")
+        grammaire.afficher_productions()
+
+        print(f"\nGénération des mots (longueur maximale {nombre_max_mots}):")
+        mots = grammaire.enumere_mots_langage(nombre_max_mots)
+        print("\n".join(mots))
+
+    except FileNotFoundError:
+        print(f"Erreur : le fichier '{fichier_grammaire}' est introuvable.")
+        sys.exit(1)
+    except ValueError:
+        print("Erreur : le premier argument doit être un nombre entier valide pour la longueur maximale des mots.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Une erreur est survenue : {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
