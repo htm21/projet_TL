@@ -13,10 +13,10 @@ def main():
         grammaire.lire(fichier_grammaire)
 
         grammaire.transformation_chomsky()
-        grammaire.to_file("test.chomsky")
+        grammaire.ecrire("test.chomsky")
 
         grammaire.transformation_greibach()
-        grammaire.to_file("test.greibach")
+        grammaire.ecrire("test.greibach")
 
     except FileNotFoundError:
         print(f"Erreur : le fichier '{fichier_grammaire}' est introuvable.")
