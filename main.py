@@ -99,7 +99,6 @@ class Grammaire:
                                 
                                 association_terminal_non_terminal[symbol] = nouveau_non_terminal
 
-                                self.ajout_non_terminal(nouveau_non_terminal)
                                 self.ajout_regle(nouveau_non_terminal, [symbol])
 
                             self.regles[membre_gauche][i][j] = nouveau_non_terminal
@@ -126,14 +125,8 @@ class Grammaire:
 
                         if nouvelle_regle not in self.regles[membre_gauche]:
                             self.ajout_regle(membre_gauche, nouvelle_regle)
-                            #print(f"NOUVELLE REGLE: {nouvelle_regle} AJOUTEE A {membre_gauche}\n")
-                        
-
-        #print(f"TERMINAUX ANNULÉS: {terminaux_annule}\n")
-        #print(f"FIN DE L'ITERATION\n{self.regles}\n")
-              
+                                      
     def suppression_epsilon(self):
-        # Générer par GPT pour relancer tant que c'est nécessaire
         while any(
             regle == ["E"] and membre_gauche != self.axiome
             for membre_gauche, membre_droit in self.regles.items()
@@ -158,7 +151,6 @@ class Grammaire:
     
     def iteration_suppression_regle_plus_deux_non_terminaux_membre_droite(self):
         regles = list(self.regles.items()) 
-        #print('-'*50)
 
         for membre_gauche, membre_droit in regles:
             nouvelles_regles = []  
@@ -179,8 +171,6 @@ class Grammaire:
 
                             self.ajout_regle(nouveau_non_terminal, nouvelle_regle)
                             nouvelles_regles.append(regle_modif)
-
-                            #print(f"\nANCIENNE REGLE: {regle}\nREGLE MODIF: {regle_modif}\nNOUVELLE REGLE: {nouvelle_regle}")
                             break
                 else:
                     nouvelles_regles.append(regle)
@@ -188,7 +178,6 @@ class Grammaire:
             self.regles[membre_gauche] = nouvelles_regles
             
     def suppression_regle_plus_deux_non_terminaux_membre_droite(self):
-        # Générer par GPT pour relancer tant que c'est nécessaire
         while any(
             sum(1 for symbol in regle if symbol in self.non_terminaux) > 2
             for membre_gauche, membre_droit in self.regles.items()
@@ -217,10 +206,10 @@ class Grammaire:
                 for i, symbol in enumerate(regle) :
                     if symbol in self.terminaux and i > 0:
                         nouveau_non_terminal = self.get_non_terminal_non_utilise()
-                        self.ajout_non_terminal(nouveau_non_terminal)
                         self.ajout_regle(nouveau_non_terminal, [symbol])
                         regle[i] = nouveau_non_terminal
-    def to_file(self, file):
+                        
+    def ecrire(self, file):
         with open(file, "w") as file:
             for membre_gauche, membre_droit in self.regles.items():
                 membre_droit = " | ".join([" ".join(part) for part in membre_droit])
@@ -317,7 +306,17 @@ if __name__ == "__main__":
             membre_droit = [part.strip() for part in membre_droit.split("|")]
             print(f'MEMBRE GAUCHE: {membre_gauche}\nMEMBRE DROIT: {membre_droit}\n')
 
-    test_lire("test/test_lecture.general")
+    #test_lire("test/test_lecture.general")
+
+    def test_suppression_axiome_membre_droit(input):
+        grammaire_test.lire(input)
+        print('---- TEST SUPPRESSION AXIOME MEMBRE DROIT ----\n')
+        grammaire_test.afficher_productions()
+        grammaire_test.suppression_axiome_membre_droit()
+        print('\nAPRES SUPPRESSION AXIOME MEMBRE DROIT\n')
+        grammaire_test.afficher_productions()
+    
+    #test_suppression_axiome_membre_droit("test/axiome_membre_droit.general")
 
     def test_suppression_terminaux(input):
         grammaire_test.lire(input)
@@ -327,7 +326,7 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION TERMINAUX\n')
         grammaire_test.afficher_productions()
 
-    test_suppression_terminaux("test/suppression_terminaux.general")
+    #test_suppression_terminaux("test/suppression_terminaux.general")
     
     def test_suppression_epsilon(input):
         grammaire_test.lire(input)
@@ -337,7 +336,7 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION EPSILON\n')
         grammaire_test.afficher_productions()
     
-    test_suppression_epsilon("test/suppression_epsilon.general")
+    #test_suppression_epsilon("test/suppression_epsilon.general")
 
     def test_suppression_regle_unite(input):
         grammaire_test.lire(input)
@@ -347,7 +346,7 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION REGLE UNITE\n')
         grammaire_test.afficher_productions()
     
-    test_suppression_regle_unite("test/suppression_regle_unite.general")
+    #test_suppression_regle_unite("test/suppression_regle_unite.general")
 
     def test_suppression_regle_plus_deux_non_terminaux_membre_droite(input):
         grammaire_test.lire(input)
@@ -357,7 +356,27 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION REGLE PLUS DE DEUX NON TERMINAUX MEMBRE DROITE\n')
         grammaire_test.afficher_productions()
     
-    test_suppression_regle_plus_deux_non_terminaux_membre_droite("test/suppression_regle_longue_non_terminal.general")
+    #test_suppression_regle_plus_deux_non_terminaux_membre_droite("test/suppression_regle_longue_non_terminal.general")
+
+    def test_suppression_non_terminaux_en_tete(input):
+        grammaire_test.lire(input)
+        print('---- TEST SUPPRESSION NON TERMINAUX EN TETE ----\n')
+        grammaire_test.afficher_productions()
+        grammaire_test.suppression_non_terminaux_en_tete()
+        print('\nAPRES SUPPRESSION NON TERMINAUX EN TETE\n')
+        grammaire_test.afficher_productions()
+    
+    #test_suppression_non_terminaux_en_tete("test/suppression_non_terminaux_tete.general")
+
+    def test_suppression_terminaux_non_en_tete(input):
+        grammaire_test.lire(input)
+        print('---- TEST SUPPRESSION TERMINAUX NON EN TETE ----\n')
+        grammaire_test.afficher_productions()
+        grammaire_test.suppression_terminaux_non_en_tete()
+        print('\nAPRES SUPPRESSION TERMINAUX NON EN TETE\n')
+        grammaire_test.afficher_productions()
+    
+    #test_suppression_terminaux_non_en_tete("test/supprime_terminaux_non_tete.general")
 
     def test_transformation_greibach(input):
         grammaire_test.lire(input)
@@ -382,21 +401,24 @@ if __name__ == "__main__":
         grammaire_test.afficher_productions()
         print()
     
-    test_transformation_chomsky("test/transformation1.general")
-    test_transformation_chomsky("test/transformation2.general")
+    #test_transformation_chomsky("test/transformation1.general")
+    #test_transformation_chomsky("test/transformation2.general")
 
     def test_enumere_mots_langage(input, n):
         print("--- TEST ENUMERATION ---\n")
         grammaire_test.lire(input)
         grammaire_test2.lire(input)
+        print("--- GRAMMAIRE INITIALE ---")
+        grammaire_test.afficher_productions()
+        print("\n--- APRES TRANSFORMATIONS ---")
         grammaire_test.transformation_greibach()
         grammaire_test2.transformation_chomsky()
     
         a = grammaire_test.enumere_mots_langage(n)
         b = grammaire_test2.enumere_mots_langage(n)
 
-        print(f"Les mots générés par la forme normale de Greibach : {a}\n")
+        print(f"Les mots générés par la forme normale de Greibach : {a}")
         print(f"Les mots générés par la forme normale de Chomsky : {b}\n")
         print(f"Les deux formes génèrent les mêmes mots : {a == b}\n")
 
-    #test_enumere_mots_langage("test/transformation2.general", 7)        
+    test_enumere_mots_langage("test/transformation2.general", 4)        

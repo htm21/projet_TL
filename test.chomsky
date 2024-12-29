@@ -1,8 +1,8 @@
-S : L4 V1 | a | b
-S0 : L4 P6 | a | b | E
-L4 : a
-P9 : b
-V1 : S O8 | P9 S | b
-P6 : S X5 | P9 S | b
-O8 : P9 S | b
-X5 : P9 S | b
+S : T2 Y9 | X8 F5 | a | b
+S0 : T2 F1 | X8 A5 | a | b | E
+T2 : a
+X8 : b
+Y9 : S T2 | a
+F5 : S X8 | b
+F1 : S T2 | a
+A5 : S X8 | b
