@@ -1,0 +1,8 @@
+S : a S U4 | b S K3 | a | b | a P3 | b R9
+S0 : a S U4 | b S K3 | a | b | E | a H8 | b S3
+U4 : a
+K3 : b
+P3 : a
+R9 : b
+H8 : a
+S3 : b

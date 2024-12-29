@@ -1,0 +1,32 @@
+import sys
+from main import Grammaire
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <fichier_grammaire>")
+        sys.exit(1)
+
+    fichier_grammaire = sys.argv[1]
+
+    try:
+        # On choisi d'utiliser deux objets Grammaire différents (n'est pas obligatoire)
+        grammaire_chomsky = Grammaire()
+        grammaire_greibach = Grammaire()
+        grammaire_chomsky.lire(fichier_grammaire)
+        grammaire_greibach.lire(fichier_grammaire)
+
+        grammaire_chomsky.transformation_chomsky()
+        grammaire_chomsky.ecrire("test.chomsky")
+
+        grammaire_greibach.transformation_greibach()
+        grammaire_greibach.ecrire("test.greibach")
+
+    except FileNotFoundError:
+        print(f"Erreur : le fichier '{fichier_grammaire}' est introuvable.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Une erreur est survenue : {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

@@ -280,18 +280,6 @@ class Grammaire:
 
 if __name__ == "__main__":
     print("\033c")
-    grammaire_test = Grammaire()
-    grammaire_test2 = Grammaire()
-
-    # Ajout des non-terminaux et terminaux
-    alphabet = "ABCDFGHIJKLMNOPQRSTUVWXYZ"
-    for letter in alphabet :
-        grammaire_test.ajout_terminal(letter.lower())
-        grammaire_test2.ajout_terminal(letter.lower())
-        for i in range(1, 11):
-            grammaire_test.ajout_non_terminal(f"{letter}{i}")
-            grammaire_test2.ajout_non_terminal(f"{letter}{i}")
-
 
 
     ################################## SECTION TEST #################################
@@ -307,9 +295,10 @@ if __name__ == "__main__":
             membre_droit = [part.strip() for part in membre_droit.split("|")]
             print(f'MEMBRE GAUCHE: {membre_gauche}\nMEMBRE DROIT: {membre_droit}\n')
 
-    #test_lire("test/test_lecture.general")
+    #test_lire("dossier_exemples/test_lecture.general")
 
     def test_suppression_axiome_membre_droit(input):
+        grammaire_test = Grammaire()
         grammaire_test.lire(input)
         print('---- TEST SUPPRESSION AXIOME MEMBRE DROIT ----\n')
         grammaire_test.afficher_productions()
@@ -317,9 +306,10 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION AXIOME MEMBRE DROIT\n')
         grammaire_test.afficher_productions()
     
-    #test_suppression_axiome_membre_droit("test/axiome_membre_droit.general")
+    #test_suppression_axiome_membre_droit("dossier_exemples/axiome_membre_droit.general")
 
     def test_suppression_terminaux(input):
+        grammaire_test = Grammaire()
         grammaire_test.lire(input)
         print('---- TEST SUPPRESSION TERMINAUX ----\n')
         grammaire_test.afficher_productions()
@@ -327,9 +317,10 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION TERMINAUX\n')
         grammaire_test.afficher_productions()
 
-    #test_suppression_terminaux("test/suppression_terminaux.general")
+    #test_suppression_terminaux("dossier_exemples/suppression_terminaux.general")
     
     def test_suppression_epsilon(input):
+        grammaire_test = Grammaire()
         grammaire_test.lire(input)
         print('---- TEST SUPPRESSION EPSILON ----\n')
         grammaire_test.afficher_productions()
@@ -337,9 +328,10 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION EPSILON\n')
         grammaire_test.afficher_productions()
     
-    #test_suppression_epsilon("test/suppression_epsilon.general")
+    #test_suppression_epsilon("dossier_exemples/suppression_epsilon.general")
 
     def test_suppression_regle_unite(input):
+        grammaire_test = Grammaire()
         grammaire_test.lire(input)
         print('---- TEST SUPPRESSION REGLE UNITE ----\n')
         grammaire_test.afficher_productions()
@@ -347,9 +339,10 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION REGLE UNITE\n')
         grammaire_test.afficher_productions()
     
-    #test_suppression_regle_unite("test/suppression_regle_unite.general")
+    #test_suppression_regle_unite("dossier_exemples/suppression_regle_unite.general")
 
     def test_suppression_regle_plus_deux_non_terminaux_membre_droite(input):
+        grammaire_test = Grammaire()
         grammaire_test.lire(input)
         print('---- TEST SUPPRESSION REGLE PLUS DE DEUX NON TERMINAUX MEMBRE DROITE ----\n')
         grammaire_test.afficher_productions()
@@ -357,9 +350,10 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION REGLE PLUS DE DEUX NON TERMINAUX MEMBRE DROITE\n')
         grammaire_test.afficher_productions()
     
-    #test_suppression_regle_plus_deux_non_terminaux_membre_droite("test/suppression_regle_longue_non_terminal.general")
+    #test_suppression_regle_plus_deux_non_terminaux_membre_droite("dossier_exemples/suppression_regle_longue_non_terminal.general")
 
     def test_suppression_non_terminaux_en_tete(input):
+        grammaire_test = Grammaire()
         grammaire_test.lire(input)
         print('---- TEST SUPPRESSION NON TERMINAUX EN TETE ----\n')
         grammaire_test.afficher_productions()
@@ -367,9 +361,10 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION NON TERMINAUX EN TETE\n')
         grammaire_test.afficher_productions()
     
-    #test_suppression_non_terminaux_en_tete("test/suppression_non_terminaux_tete.general")
+    #test_suppression_non_terminaux_en_tete("dossier_exemples/suppression_non_terminaux_tete.general")
 
     def test_suppression_terminaux_non_en_tete(input):
+        grammaire_test = Grammaire()
         grammaire_test.lire(input)
         print('---- TEST SUPPRESSION TERMINAUX NON EN TETE ----\n')
         grammaire_test.afficher_productions()
@@ -377,9 +372,10 @@ if __name__ == "__main__":
         print('\nAPRES SUPPRESSION TERMINAUX NON EN TETE\n')
         grammaire_test.afficher_productions()
     
-    #test_suppression_terminaux_non_en_tete("test/supprime_terminaux_non_tete.general")
+    #test_suppression_terminaux_non_en_tete("dossier_exemples/supprime_terminaux_non_tete.general")
 
     def test_transformation_greibach(input):
+        grammaire_test = Grammaire()
         grammaire_test.lire(input)
         num_regle = input.split(".")[0][-1]
         print(f'--- TEST GREIBACH n°{num_regle} ---\n')
@@ -389,10 +385,11 @@ if __name__ == "__main__":
         grammaire_test.afficher_productions()
         print()
     
-    #test_transformation_greibach("test/transformation1.general")
-    #test_transformation_greibach("test/transformation2.general")
+    #test_transformation_greibach("dossier_exemples/transformation1.general")
+    #test_transformation_greibach("dossier_exemples/transformation2.general")
 
     def test_transformation_chomsky(input):
+        grammaire_test = Grammaire()
         grammaire_test.lire(input)
         num_regle = input.split(".")[0][-1]
         print(f'--- TEST CHOMSKY n°{num_regle} ---\n')
@@ -402,10 +399,12 @@ if __name__ == "__main__":
         grammaire_test.afficher_productions()
         print()
     
-    #test_transformation_chomsky("test/transformation1.general")
-    #test_transformation_chomsky("test/transformation2.general")
+    #test_transformation_chomsky("dossier_exemples/transformation1.general")
+    #test_transformation_chomsky("dossier_exemples/transformation2.general")
 
     def test_enumere_mots_langage(input, n):
+        grammaire_test = Grammaire()
+        grammaire_test2 = Grammaire()
         print("--- TEST ENUMERATION ---\n")
         grammaire_test.lire(input)
         grammaire_test2.lire(input)
@@ -422,4 +421,4 @@ if __name__ == "__main__":
         print(f"Les mots générés par la forme normale de Chomsky : {b}\n")
         print(f"Les deux formes génèrent les mêmes mots : {a == b}\n")
 
-    test_enumere_mots_langage("test/transformation2.general", 4)        
+    #test_enumere_mots_langage("dossier_exemples/transformation2.general", 5)   
