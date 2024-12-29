@@ -16,10 +16,12 @@ def main():
         grammaire_greibach.lire(fichier_grammaire)
 
         grammaire_chomsky.transformation_chomsky()
-        grammaire_chomsky.ecrire("test.chomsky")
+        filepath1 = fichier_grammaire.split("/")[-1].split(".")[:-1][0] + ".chomsky"
+        grammaire_chomsky.ecrire(filepath1)
 
         grammaire_greibach.transformation_greibach()
-        grammaire_greibach.ecrire("test.greibach")
+        filepath2 = fichier_grammaire.split("/")[-1].split(".")[:-1][0] + ".greibach"
+        grammaire_greibach.ecrire(filepath2)
 
     except FileNotFoundError:
         print(f"Erreur : le fichier '{fichier_grammaire}' est introuvable.")

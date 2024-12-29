@@ -70,7 +70,7 @@ class Grammaire:
             line = line.strip()
             membre_gauche, membre_droit = line.split(":")
             membre_droit = [part.strip() for part in membre_droit.split("|")]
-            self.regles[membre_gauche.strip()] = [re.findall(fr'[A-Z][0-9]|[a-z]|{self.axiome}|E', symbol) for symbol in membre_droit]
+            self.regles[membre_gauche.strip()] = [re.findall(fr'[A-Z](?:10|[1-9])|[a-z]|{self.axiome}|E', symbol) for symbol in membre_droit]
 
     def suppression_axiome_membre_droit(self):
         regles = list(self.regles.items())
