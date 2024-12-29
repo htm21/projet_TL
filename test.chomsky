@@ -1,8 +1,0 @@
-S : T2 Y9 | X8 F5 | a | b
-S0 : T2 F1 | X8 A5 | a | b | E
-T2 : a
-X8 : b
-Y9 : S T2 | a
-F5 : S X8 | b
-F1 : S T2 | a
-A5 : S X8 | b
