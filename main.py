@@ -272,6 +272,7 @@ class Grammaire:
     def enumere_mots_langage(self, n) :
         langage = set()
         self.enumere_mots(n, [self.axiome], langage)
+        langage.add("E")
         return sorted(langage, key=lambda x: (len(x), x))
 
 
