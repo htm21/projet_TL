@@ -1,7 +1,7 @@
 import re
-from collections import deque
 
 class Grammaire:
+
     def __init__(self):
         self.__axiome = "S"
         self.__terminaux = set()
@@ -45,7 +45,7 @@ class Grammaire:
     def ajout_terminal(self, terminal):
         self.terminaux.add(terminal)
     
-    def ajout_non_terminal(self, non_terminal):
+    def ajout_non_terminal(self, non_terminal):        
         self.non_terminaux.add(non_terminal)
     
     def ajout_regle(self, non_terminal, regle):
@@ -55,14 +55,15 @@ class Grammaire:
             self.regles[non_terminal] = [regle]
 
     def __str__(self):
+        """ Affiche le contenu de la structure de donnée (grammaire) de manière lisible. """
+    
         return f"Terminaux: {self.terminaux}\nNon-terminaux: {self.non_terminaux}\nAxiome: {self.axiome}\nRegles: {self.regles}"
 
-    def est_algébrique(self):
-        if any(key in self.terminaux for key in self.regles.keys()):
-            return False
-        return True
-    
+    ################################## SECTION LECTURE/ECRITURE DE FICHIER #################################
+
     def lire(self, file):
+        """ Lit une grammaire depuis un fichier texte avec extension .general uniquement. """
+
         with open(file) as file:
             data = file.readlines()
         
@@ -72,7 +73,25 @@ class Grammaire:
             membre_droit = [part.strip() for part in membre_droit.split("|")]
             self.regles[membre_gauche.strip()] = [re.findall(fr'[A-Z](?:10|[1-9])|[a-z]|{self.axiome}|E', symbol) for symbol in membre_droit]
 
+    def ecrire(self, file):
+            """ Écrit la grammaire dans un fichier texte. """
+            with open(file, "w") as file:
+                for membre_gauche, membre_droit in self.regles.items():
+                    membre_droit = " | ".join([" ".join(part) for part in membre_droit])
+                    file.write(f"{membre_gauche} : {membre_droit}\n")
+
+    ################################## SECTION SIMPLIFICATION #################################
+
+    def est_algébrique(self):
+        """ Vérifie si la grammaire est algébrique. """
+
+        if any(key in self.terminaux for key in self.regles.keys()):
+            return False
+        return True
+
     def suppression_axiome_membre_droit(self):
+        """ Supprime l'axiome des membres droits de règles. """
+
         regles = list(self.regles.items())
 
         for _, membre_droit in regles:
@@ -85,6 +104,8 @@ class Grammaire:
                     self.set_axiome(new_axiome)
     
     def suppression_terminaux(self):
+        """ Supprime les terminaux. """
+
         regles = list(self.regles.items())
         association_terminal_non_terminal = {} 
 
@@ -104,6 +125,8 @@ class Grammaire:
                             self.regles[membre_gauche][i][j] = nouveau_non_terminal
 
     def iteration_suppression_epsilon(self):
+        """ Itère la suppression des règles epsilon. """
+
         terminaux_annule = set()
 
         for membre_gauche, membre_droit in self.regles.items():
@@ -127,6 +150,8 @@ class Grammaire:
                             self.ajout_regle(membre_gauche, nouvelle_regle)
                                       
     def suppression_epsilon(self):
+        """ Supprime les règles epsilon. """
+
         while any(
             regle == ["E"] and membre_gauche != self.axiome
             for membre_gauche, membre_droit in self.regles.items()
@@ -135,6 +160,8 @@ class Grammaire:
             self.iteration_suppression_epsilon()
     
     def suppression_regle_unite(self):
+        """ Supprime les règles unités. """
+
         regles = list(self.regles.items())
 
         for membre_gauche, membre_droit in regles:
@@ -150,6 +177,8 @@ class Grammaire:
 
     
     def iteration_suppression_regle_plus_deux_non_terminaux_membre_droite(self):
+        """ Itère la suppression des règles contenant plus de deux non-terminaux dans le membre droit. """
+
         regles = list(self.regles.items()) 
 
         for membre_gauche, membre_droit in regles:
@@ -178,6 +207,8 @@ class Grammaire:
             self.regles[membre_gauche] = nouvelles_regles
             
     def suppression_regle_plus_deux_non_terminaux_membre_droite(self):
+        """ Supprime les règles contenant plus de deux non-terminaux dans le membre droit. """
+
         while any(
             sum(1 for symbol in regle if symbol in self.non_terminaux) > 2
             for membre_gauche, membre_droit in self.regles.items()
@@ -186,6 +217,8 @@ class Grammaire:
             self.iteration_suppression_regle_plus_deux_non_terminaux_membre_droite()
 
     def suppression_non_terminaux_en_tete(self):
+        """ Supprime les non-terminaux en tête de règle. """
+
         for non_terminal, regles in list(self.regles.items()):
             nouvelles_regles = []
 
@@ -199,6 +232,8 @@ class Grammaire:
             self.regles[non_terminal] = nouvelles_regles
 
     def suppression_terminaux_non_en_tete(self):
+        """ Supprime les terminaux non en tête de règle. """
+
         regles = list(self.regles.items())
 
         for membre_gauche, membre_droit in regles:
@@ -209,23 +244,6 @@ class Grammaire:
                         self.ajout_regle(nouveau_non_terminal, [symbol])
                         regle[i] = nouveau_non_terminal
                         
-    def ecrire(self, file):
-        with open(file, "w") as file:
-            for membre_gauche, membre_droit in self.regles.items():
-                membre_droit = " | ".join([" ".join(part) for part in membre_droit])
-                file.write(f"{membre_gauche} : {membre_droit}\n")
-
-    def afficher_productions(self):
-        """
-        Affiche les productions d'une grammaire de manière lisible.
-        Généré par GPT pour faciliter la lecture
-        """
-        print("Productions de la grammaire :")
-        for non_terminal, rules in self.regles.items():
-            rules_str = " | ".join([" ".join(rule) for rule in rules])
-            print(f"{non_terminal} -> {rules_str}")
-
-
     ################################## SECTION TRANSFORMATION #################################
 
     def transformation_greibach(self):
@@ -248,7 +266,7 @@ class Grammaire:
             self.suppression_epsilon()
             self.suppression_regle_unite()
 
-    ################################## SECTION ENUMERATION #################################
+    ################################## SECTION ENUMERATION DE MOTS #################################
 
     def contient_que_des_terminaux(self, w):
         return all(symbol in self.terminaux for symbol in w)
@@ -275,12 +293,23 @@ class Grammaire:
         langage.add("E")
         return sorted(langage, key=lambda x: (len(x), x))
 
+    ################################## SECTION ANNEXE #################################
 
+    def afficher_productions(self):
+        """
+        Affiche les productions d'une grammaire de manière lisible.
+        Permet une communication plus claire avec l'utilisateur.
+        Généré par ChatGPT.
+        """
+        print("Productions de la grammaire :")
+        for non_terminal, rules in self.regles.items():
+            rules_str = " | ".join([" ".join(rule) for rule in rules])
+            print(f"{non_terminal} -> {rules_str}")
+    
     ################################## SECTION PRINCIPALE #################################
 
 if __name__ == "__main__":
     print("\033c")
-
 
     ################################## SECTION TEST #################################
 
