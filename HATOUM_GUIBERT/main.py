@@ -57,7 +57,7 @@ class Grammaire:
 
     def __str__(self):
         """ Affiche le contenu de la structure de donnée (grammaire) de manière lisible. """
-    
+
         return f"Terminaux: {self.terminaux}\nNon-terminaux: {self.non_terminaux}\nAxiome: {self.axiome}\nRegles: {self.regles}"
 
     ################################## SECTION LECTURE/ECRITURE DE FICHIER #################################
@@ -70,6 +70,8 @@ class Grammaire:
         
         for line in data:
             line = line.strip()
+            if not line or ":" not in line:
+                continue
             membre_gauche, membre_droit = line.split(":")
             membre_droit = [part.strip() for part in membre_droit.split("|")]
             membre_gauche = membre_gauche.strip()
