@@ -3,16 +3,16 @@ import re
 class Grammaire:
 
     def __init__(self):
-        self.__axiome = "S"
+        self.__axiome = None
         self.__terminaux = set()
-        self.__non_terminaux = {self.axiome}
+        self.__non_terminaux = set()
         self.__regles = {}
         alphabet = "ABCDFGHIJKLMNOPQRSTUVWXYZ"
         for letter in alphabet:
             self.ajout_terminal(letter.lower())
             for i in range(1, 11):
                 self.ajout_non_terminal(f"{letter}{i}")
-
+        self.ajout_terminal("e")
 
     # Getters et Setters
     def get_terminaux(self):
@@ -32,6 +32,7 @@ class Grammaire:
             if non_terminal not in self.regles.keys() and all(non_terminal not in regle for regle in self.regles.values()):
                 return non_terminal
         return None
+        
     def set_axiome(self, axiome):
         self.__axiome = axiome
         
@@ -40,7 +41,6 @@ class Grammaire:
     axiome = property(get_axiome, set_axiome)
     regles = property(get_regles)
 
-    
     # Ajout des terminaux, non-terminaux et règles
     def ajout_terminal(self, terminal):
         self.terminaux.add(terminal)
@@ -49,14 +49,15 @@ class Grammaire:
         self.non_terminaux.add(non_terminal)
     
     def ajout_regle(self, non_terminal, regle):
-        if non_terminal in self.regles and regle not in self.regles[non_terminal]:
-            self.regles[non_terminal].append(regle)
+        if non_terminal in self.regles:
+            if regle not in self.regles[non_terminal]:
+                self.regles[non_terminal].append(regle)
         else:
             self.regles[non_terminal] = [regle]
 
     def __str__(self):
         """ Affiche le contenu de la structure de donnée (grammaire) de manière lisible. """
-    
+
         return f"Terminaux: {self.terminaux}\nNon-terminaux: {self.non_terminaux}\nAxiome: {self.axiome}\nRegles: {self.regles}"
 
     ################################## SECTION LECTURE/ECRITURE DE FICHIER #################################
@@ -69,9 +70,21 @@ class Grammaire:
         
         for line in data:
             line = line.strip()
+            if not line or ":" not in line:
+                continue
             membre_gauche, membre_droit = line.split(":")
             membre_droit = [part.strip() for part in membre_droit.split("|")]
-            self.regles[membre_gauche.strip()] = [re.findall(fr'[A-Z](?:10|[1-9])|[a-z]|{self.axiome}|E', symbol) for symbol in membre_droit]
+            membre_gauche = membre_gauche.strip()
+            if membre_gauche in self.non_terminaux :
+                if self.regles == {}:
+                    self.set_axiome(membre_gauche)
+
+                membre_droit = [re.findall(fr'[A-Z](?:10|[1-9])|[a-z]|{self.axiome}|E', symbol) for symbol in membre_droit]
+                if membre_gauche not in self.regles :
+                    self.regles[membre_gauche] = membre_droit
+                else:
+                    for regle in membre_droit :
+                        self.ajout_regle(membre_gauche, regle)
 
     def ecrire(self, file):
             """ Écrit la grammaire dans un fichier texte. """
@@ -97,8 +110,7 @@ class Grammaire:
         for _, membre_droit in regles:
             for valeur in membre_droit:
                 if self.axiome in valeur:
-                    new_axiome = self.axiome + '0'
-                    self.ajout_non_terminal(new_axiome)
+                    new_axiome = self.get_non_terminal_non_utilise()
                     for regle in self.regles[self.axiome]:
                         self.ajout_regle(new_axiome, regle)
                     self.set_axiome(new_axiome)
@@ -314,15 +326,10 @@ if __name__ == "__main__":
     ################################## SECTION TEST #################################
 
     def test_lire(input):
-        print('\n--- TEST LECTURE ---\n')
-        with open(input) as file:
-            data = file.readlines()
-
-        for line in data:
-            line = line.strip()
-            membre_gauche, membre_droit = line.split(":")
-            membre_droit = [part.strip() for part in membre_droit.split("|")]
-            print(f'MEMBRE GAUCHE: {membre_gauche}\nMEMBRE DROIT: {membre_droit}\n')
+        grammaire_test = Grammaire()
+        grammaire_test.lire(input)
+        print('---- TEST LECTURE ----\n')
+        grammaire_test.afficher_productions()
 
     #test_lire("dossier_exemples/test_lecture.general")
 
