@@ -1,1 +1,1 @@
-S : aSbS | a | b | E
+S1 : aS1bS1 | a | b | E

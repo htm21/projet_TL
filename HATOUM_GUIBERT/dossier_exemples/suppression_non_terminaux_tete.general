@@ -1,3 +1,3 @@
-S : A1ab | cA1 | B1c | d
+S1 : A1ab | cA1 | B1c | d
 A1 : a | b
 B1 : e | f
