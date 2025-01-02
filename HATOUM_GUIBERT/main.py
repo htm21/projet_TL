@@ -90,10 +90,11 @@ class Grammaire:
     def ecrire(self, file):
             """ Écrit la grammaire dans un fichier texte. """
             with open(file, "w") as file:
+                file.write(f'{self.axiome} : {" | ".join([" ".join(part) for part in self.regles[self.axiome]])}\n')
                 for membre_gauche, membre_droit in self.regles.items():
-                    membre_droit = " | ".join([" ".join(part) for part in membre_droit])
-                    file.write(f"{membre_gauche} : {membre_droit}\n")
-
+                    if membre_gauche != self.axiome:
+                        membre_droit = " | ".join([" ".join(part) for part in membre_droit])
+                        file.write(f"{membre_gauche} : {membre_droit}\n")
     ################################## SECTION SIMPLIFICATION #################################
 
     def est_algébrique(self):
