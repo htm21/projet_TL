@@ -1,6 +1,6 @@
 import sys
 from main import Grammaire
-
+import os
 def main():
     if len(sys.argv) != 2:
         print("Usage: python script.py <fichier_grammaire>")
@@ -16,12 +16,10 @@ def main():
         grammaire_greibach.lire(fichier_grammaire)
 
         grammaire_chomsky.transformation_chomsky()
-        filepath1 = fichier_grammaire.split("/")[-1].split(".")[:-1][0] + ".chomsky"
-        grammaire_chomsky.ecrire(filepath1)
+        grammaire_chomsky.ecrire(os.path.splitext(os.path.basename(fichier_grammaire))[0] + ".chomsky")
 
         grammaire_greibach.transformation_greibach()
-        filepath2 = fichier_grammaire.split("/")[-1].split(".")[:-1][0] + ".greibach"
-        grammaire_greibach.ecrire(filepath2)
+        grammaire_greibach.ecrire(os.path.splitext(os.path.basename(fichier_grammaire))[0] + ".greibach")
 
     except FileNotFoundError:
         print(f"Erreur : le fichier '{fichier_grammaire}' est introuvable.")
