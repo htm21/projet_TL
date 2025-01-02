@@ -1,3 +1,4 @@
+import os
 import re
 
 class Grammaire:
@@ -300,9 +301,11 @@ class Grammaire:
 
                     self.enumere_mots(n, w2, langage, fichier, niveau+1)
     
-    def enumere_mots_langage(self, n) :
+    def enumere_mots_langage(self, n, fichier="mots_generes.txt"):
         langage = set()
-        self.enumere_mots(n, [self.axiome], langage, "mots_generes.txt")
+        if os.path.exists(fichier):
+            os.remove(fichier)
+        self.enumere_mots(n, [self.axiome], langage, fichier)
         langage.add("E")
         return sorted(langage, key=lambda x: (len(x), x))
 
