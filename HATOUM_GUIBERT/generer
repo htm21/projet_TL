@@ -17,7 +17,7 @@ def main():
 
 
         print(f"\nGénération des mots (longueur maximale {nombre_max_mots}):")
-        mots = grammaire.enumere_mots_langage(nombre_max_mots, fichier=f'{fichier_grammaire}.mots')
+        mots = grammaire.enumere_mots_langage(nombre_max_mots, fichier=f'{fichier_grammaire}.arbre')
         print("\n".join(mots))
 
     except FileNotFoundError:
