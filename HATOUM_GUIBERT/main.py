@@ -285,12 +285,10 @@ class Grammaire:
     def contient_que_des_terminaux(self, w):
         return all(symbol in self.terminaux for symbol in w)
 
-    def enumere_mots(self, n, w, langage, fichier, niveau=0) :
+    def enumere_mots(self, n, w, langage) :
 
         if len(w) > n :
             return
-        with open(fichier, "a") as f:
-            f.write("  " * niveau + "".join(w) + "\n")
         if self.contient_que_des_terminaux(w) :
             langage.add("".join(w))
             return
@@ -300,13 +298,11 @@ class Grammaire:
                 for w3 in self.regles[w[i]] :
                     w2 = w[:i] + w3 + w[i+1:]
 
-                    self.enumere_mots(n, w2, langage, fichier, niveau+1)
+                    self.enumere_mots(n, w2, langage)
     
-    def enumere_mots_langage(self, n, fichier="mots_generes.txt"):
+    def enumere_mots_langage(self, n):
         langage = set()
-        if os.path.exists(fichier):
-            os.remove(fichier)
-        self.enumere_mots(n, [self.axiome], langage, fichier)
+        self.enumere_mots(n, [self.axiome], langage)
         langage.add("E")
         return sorted(langage, key=lambda x: (len(x), x))
 
