@@ -21,9 +21,7 @@ def main():
         grammaire_greibach.transformation_greibach()
         grammaire_greibach.ecrire(os.path.splitext(os.path.basename(fichier_grammaire))[0] + ".greibach")
 
-    except FileNotFoundError:
-        print(f"Erreur : le fichier '{fichier_grammaire}' est introuvable.")
-        sys.exit(1)
+
     except Exception as e:
         print(f"Une erreur est survenue : {e}")
         sys.exit(1)
