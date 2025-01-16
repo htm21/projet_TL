@@ -229,6 +229,11 @@ class Grammaire:
             for regle in membre_droit
         ):
             self.iteration_suppression_regle_plus_deux_non_terminaux_membre_droite()
+    def is_epsilon_generable(self):
+        for regle in self.regles[self.axiome]:
+            if regle == ["E"]:
+                return True
+        return False
 
     def suppression_non_terminaux_en_tete(self):
         """ Supprime les non-terminaux en tête de règle. """
@@ -307,8 +312,12 @@ class Grammaire:
         if os.path.exists(fichier):
             os.remove(fichier)
         self.enumere_mots(n, [self.axiome], langage, fichier)
-        langage.add("E")
+        if self.is_epsilon_generable():
+            langage.add("E")
+        
         return sorted(langage, key=lambda x: (len(x), x))
+    
+
 
     ################################## SECTION ANNEXE #################################
 
