@@ -219,7 +219,11 @@ class Grammaire:
                     nouvelles_regles.append(regle)
 
             self.regles[membre_gauche] = nouvelles_regles
-            
+    def is_epsilon_generable(self):
+        for regle in self.regles[self.axiome]:
+            if regle == ["E"]:
+                return True
+        return False 
     def suppression_regle_plus_deux_non_terminaux_membre_droite(self):
         """ Supprime les règles contenant plus de deux non-terminaux dans le membre droit. """
 
@@ -303,7 +307,8 @@ class Grammaire:
     def enumere_mots_langage(self, n):
         langage = set()
         self.enumere_mots(n, [self.axiome], langage)
-        langage.add("E")
+        if self.is_epsilon_generable():
+            langage.add("E")
         return sorted(langage, key=lambda x: (len(x), x))
 
     ################################## SECTION ANNEXE #################################
