@@ -229,11 +229,6 @@ class Grammaire:
             for regle in membre_droit
         ):
             self.iteration_suppression_regle_plus_deux_non_terminaux_membre_droite()
-    def is_epsilon_generable(self):
-        for regle in self.regles[self.axiome]:
-            if regle == ["E"]:
-                return True
-        return False
 
     def suppression_non_terminaux_en_tete(self):
         """ Supprime les non-terminaux en tête de règle. """
@@ -288,14 +283,19 @@ class Grammaire:
     ################################## SECTION ENUMERATION DE MOTS #################################
 
     def contient_que_des_terminaux(self, w):
+        ''' Retourne un booléen indiquant si le mot w ne contient que des terminaux '''
+
         return all(symbol in self.terminaux for symbol in w)
 
     def enumere_mots(self, n, w, langage, fichier, niveau=0) :
+        ''' Génère les mots de longueur inférieure à n à partir de w '''
 
         if len(w) > n :
             return
+        
         with open(fichier, "a") as f:
             f.write("  " * niveau + "".join(w) + "\n")
+
         if self.contient_que_des_terminaux(w) :
             langage.add("".join(w))
             return
@@ -308,6 +308,8 @@ class Grammaire:
                     self.enumere_mots(n, w2, langage, fichier, niveau+1)
     
     def enumere_mots_langage(self, n, fichier="mots_generes.txt"):
+        ''' Enumère les mots de longueur inférieure à n générés par la grammaire '''
+
         langage = set()
         if os.path.exists(fichier):
             os.remove(fichier)
@@ -316,7 +318,6 @@ class Grammaire:
             langage.add("E")
         
         return sorted(langage, key=lambda x: (len(x), x))
-    
 
 
     ################################## SECTION ANNEXE #################################
@@ -331,6 +332,16 @@ class Grammaire:
         for non_terminal, rules in self.regles.items():
             rules_str = " | ".join([" ".join(rule) for rule in rules])
             print(f"{non_terminal} -> {rules_str}")
+
+    def is_epsilon_generable(self):
+        ''' Vérifie si le mot vide est générable par la grammaire '''
+
+        for regle in self.regles[self.axiome]:
+            if regle == ["E"]:
+
+                return True
+            
+        return False
     
     ################################## SECTION PRINCIPALE #################################
 
