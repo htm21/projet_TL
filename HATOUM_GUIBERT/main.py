@@ -11,7 +11,7 @@ class Grammaire:
         alphabet = "ABCDFGHIJKLMNOPQRSTUVWXYZ"
         for letter in alphabet:
             self.ajout_terminal(letter.lower())
-            for i in range(1, 11):
+            for i in range(0, 10):
                 self.ajout_non_terminal(f"{letter}{i}")
         self.ajout_terminal("e")
 
@@ -80,7 +80,7 @@ class Grammaire:
                 if self.regles == {}:
                     self.set_axiome(membre_gauche)
 
-                membre_droit = [re.findall(fr'[A-Z](?:10|[1-9])|[a-z]|{self.axiome}|E', symbol) for symbol in membre_droit]
+                membre_droit = [re.findall(fr'[A-Z][0-9]|[a-z]|{self.axiome}|E', symbol) for symbol in membre_droit]
                 if membre_gauche not in self.regles :
                     self.regles[membre_gauche] = membre_droit
                 else:
@@ -95,6 +95,7 @@ class Grammaire:
                     if membre_gauche != self.axiome:
                         membre_droit = " | ".join([" ".join(part) for part in membre_droit])
                         file.write(f"{membre_gauche} : {membre_droit}\n")
+
     ################################## SECTION SIMPLIFICATION #################################
 
     def est_algébrique(self):
