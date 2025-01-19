@@ -134,10 +134,10 @@ class Grammaire:
                                 nouveau_non_terminal = self.get_non_terminal_non_utilise()
                                 
                                 association_terminal_non_terminal[symbol] = nouveau_non_terminal
-
                                 self.ajout_regle(nouveau_non_terminal, [symbol])
-
-                            self.regles[membre_gauche][i][j] = nouveau_non_terminal
+                                self.regles[membre_gauche][i][j] = nouveau_non_terminal
+                            else:
+                                self.regles[membre_gauche][i][j] = association_terminal_non_terminal[symbol]
 
     def iteration_suppression_epsilon(self):
         """ Itère la suppression des règles epsilon. """
